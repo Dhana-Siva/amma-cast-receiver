@@ -54,11 +54,23 @@
       }
     }
 
+    function stopVideo() {
+      pendingVideoId = null;
+      if (ytPlayer && ytPlayer.stopVideo) {
+        ytPlayer.stopVideo();
+      }
+      document.getElementById('idle').style.display = 'flex';
+    }
+
     const context = cast.framework.CastReceiverContext.getInstance();
 
     context.addCustomMessageListener(NAMESPACE, (event) => {
-      const videoId = event.data && event.data.videoId;
-      if (videoId) playVideo(videoId);
+      const data = event.data || {};
+      if (data.action === 'stop') {
+        stopVideo();
+      } else if (data.videoId) {
+        playVideo(data.videoId);
+      }
     });
 
     context.start();
