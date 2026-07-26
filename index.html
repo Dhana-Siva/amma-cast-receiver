@@ -13,8 +13,9 @@
     }
     #debug {
       position: absolute; bottom: 8px; left: 8px; right: 8px;
-      color: rgba(255,255,255,0.5); font-family: monospace; font-size: 14px;
-      white-space: pre-wrap; word-break: break-all; pointer-events: none;
+      color: rgba(255,255,255,0.75); font-family: monospace; font-size: 22px;
+      line-height: 1.4; white-space: pre-wrap; word-break: break-all;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -37,33 +38,66 @@
     let ytPlayer = null;
     let pendingVideoId = null;
 
+    // Small on-screen scrolling log — there's no remote console access to
+    // this screen, so this is the only way to see what's actually happening
+    // when something doesn't play.
+    const debugLines = [];
+    function debugLog(message) {
+      debugLines.push(new Date().toLocaleTimeString() + ' ' + message);
+      while (debugLines.length > 8) debugLines.shift();
+      const el = document.getElementById('debug');
+      if (el) el.textContent = debugLines.join('\n');
+    }
+
+    window.onerror = (message, source, lineno) => {
+      debugLog('JS ERROR: ' + message + ' (line ' + lineno + ')');
+    };
+
+    // If this never logs, the YouTube iframe API script itself failed to
+    // load/execute on this device — a different problem than anything
+    // player-related below.
+    debugLog('page loaded, waiting for YT API...');
+
     function onYouTubeIframeAPIReady() {
+      debugLog('YT API ready, creating player');
       ytPlayer = new YT.Player('player', {
         height: '100%',
         width: '100%',
         playerVars: { autoplay: 1, controls: 0, rel: 0 },
         events: {
           onReady: () => {
+            debugLog('player onReady');
             if (pendingVideoId) {
               playVideo(pendingVideoId);
               pendingVideoId = null;
             }
+          },
+          onError: (e) => {
+            // Common codes: 2 invalid param, 5 HTML5 error, 100 not found,
+            // 101/150 embedding disabled by the video's owner.
+            debugLog('player onError code=' + e.data);
+          },
+          onStateChange: (e) => {
+            debugLog('player state=' + e.data);
           }
         }
       });
     }
 
     function playVideo(videoId) {
+      debugLog('playVideo ' + videoId);
       document.getElementById('idle').style.display = 'none';
       if (ytPlayer && ytPlayer.loadVideoById) {
         ytPlayer.loadVideoById(videoId);
       } else {
         // Player not constructed yet — stash it for onReady to pick up.
+        debugLog('player not ready yet, stashing videoId');
         pendingVideoId = videoId;
       }
     }
 
     function stopVideo() {
+      debugLog('stopVideo');
       pendingVideoId = null;
       if (ytPlayer && ytPlayer.stopVideo) {
         ytPlayer.stopVideo();
@@ -86,10 +120,7 @@
       }
       data = data || {};
 
-      const debugEl = document.getElementById('debug');
-      if (debugEl) {
-        debugEl.textContent = new Date().toLocaleTimeString() + ' received: ' + JSON.stringify(data);
-      }
+      debugLog('received: ' + JSON.stringify(data));
 
       if (data.action === 'stop') {
         stopVideo();
