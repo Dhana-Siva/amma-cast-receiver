@@ -11,11 +11,20 @@
       display: flex; align-items: center; justify-content: center;
       color: #fff; font-family: sans-serif; font-size: 2vw; opacity: 0.6;
     }
+    #debug {
+      position: absolute; bottom: 8px; left: 8px; right: 8px;
+      color: rgba(255,255,255,0.5); font-family: monospace; font-size: 14px;
+      white-space: pre-wrap; word-break: break-all; pointer-events: none;
+    }
   </style>
 </head>
 <body>
   <div id="idle">Amma</div>
   <div id="player"></div>
+  <!-- Visible last-message trace — there's no remote console access to this
+       screen, so this is how we confirm what actually arrived, in place of
+       browser devtools. -->
+  <div id="debug"></div>
 
   <script src="https://www.youtube.com/iframe_api"></script>
   <script src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
@@ -65,7 +74,23 @@
     const context = cast.framework.CastReceiverContext.getInstance();
 
     context.addCustomMessageListener(NAMESPACE, (event) => {
-      const data = event.data || {};
+      // event.data's exact shape (raw JSON string vs. already-parsed object)
+      // isn't documented, so handle both rather than assume one.
+      let data = event.data;
+      if (typeof data === 'string') {
+        try {
+          data = JSON.parse(data);
+        } catch (e) {
+          data = {};
+        }
+      }
+      data = data || {};
+
+      const debugEl = document.getElementById('debug');
+      if (debugEl) {
+        debugEl.textContent = new Date().toLocaleTimeString() + ' received: ' + JSON.stringify(data);
+      }
+
       if (data.action === 'stop') {
         stopVideo();
       } else if (data.videoId) {
