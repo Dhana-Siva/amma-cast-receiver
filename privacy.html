@@ -14,12 +14,18 @@
 </head>
 <body>
 <h1>Amma — Privacy Policy</h1>
-<p class="updated">Last updated: August 16, 2026</p>
+<p class="updated">Last updated: September 2026</p>
 
 <p>Amma ("Amma Appa Arugil - AAA") is a family app that lets a parent talk
 to it by voice and receive a spoken reply generated to sound like their
-child, in the child's own cloned voice. This page explains what
-information the app collects, how it's used, and who it's shared with.</p>
+child, in the child's own cloned voice. To do this, Amma sends what you
+say to two third-party AI services on every message — <strong>Anthropic</strong>
+(whose Claude AI writes Amma's replies) and <strong>ElevenLabs</strong>
+(which turns your speech into text, and text into Amma's spoken voice).
+The app itself discloses this and asks you to acknowledge it during
+setup, before your first conversation. This page explains what
+information the app collects, how it's used, and who it's shared with in
+full detail.</p>
 
 <h2>What we collect</h2>
 <ul>
@@ -52,7 +58,11 @@ information the app collects, how it's used, and who it's shared with.</p>
 <h2>Who we share it with</h2>
 <ul>
   <li><strong>Anthropic</strong> (Claude) — processes your transcript to
-  generate Amma's reply text.</li>
+  generate Amma's reply text. If your question needs current information
+  (like today's news or a live score), Anthropic's web search also sends
+  a short search query — generated from your transcript, not your raw
+  words verbatim — to retrieve real-time results, which are then used to
+  write the reply.</li>
   <li><strong>ElevenLabs</strong> — processes voice recordings for
   speech-to-text transcription, and (if you opt in) voice cloning and
   text-to-speech for replies.</li>
@@ -62,7 +72,14 @@ information the app collects, how it's used, and who it's shared with.</p>
   device discovery. The YouTube Data API is used only to search for
   videos by keyword.</li>
 </ul>
-<p>We do not sell your data, and we do not share it with anyone else.</p>
+<p>We do not sell your data, and we do not share it with anyone else
+beyond what's listed above, for any purpose beyond what's described
+here. Anthropic's own commercial terms confirm that data sent through
+its API is never used to train its models. We've also opted out of
+ElevenLabs' equivalent setting (as of September 2026) — audio sent from
+that point on is used only to do what Amma asked of it (transcription,
+or generating a reply in your child's voice), not to improve
+ElevenLabs' own models.</p>
 
 <h2>Voice cloning consent</h2>
 <p>Voice cloning is entirely optional and requires explicit, separate
